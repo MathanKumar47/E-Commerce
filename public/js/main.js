@@ -59,7 +59,7 @@
             },
             success: function(response) {
 
-				alert(response.status);
+				swal(response.status);
 
 				loadCart();
                 // if (response.status === "success") {
