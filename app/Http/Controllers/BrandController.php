@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Brand;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 
 class BrandController extends Controller
 {
@@ -36,11 +38,25 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-        $brand = new Brand();
-        $brand->name = $request->name;
-        $brand->description = $request->description;
-        $brand->save();
-        return redirect()->back()->with('message', 'Brand Successfully Created');
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required',
+                'description' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+            }
+
+            $brand = new Brand();
+            $brand->name = $request->input('name');
+            $brand->description = $request->input('description');
+            $brand->save();
+
+            return response()->json(['message' => 'Brand Successfully Created'], Response::HTTP_CREATED);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to create brand'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -49,14 +65,16 @@ class BrandController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function change_status(Brand $brand)
+    public function changeStatus(Brand $brand)
     {
-        if ($brand->status == 1) {
-            $brand->update(['status' => 0]);
-        } else {
-            $brand->update(['status' => 1]);
+        try {
+            $status = $brand->status == 1 ? 0 : 1;
+            $brand->update(['status' => $status]);
+
+            return response()->json(['message' => 'Status Change Successfully'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to change status'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        return redirect()->back()->with('message', 'Status Change Successfully');
     }
 
     /**
@@ -79,11 +97,24 @@ class BrandController extends Controller
      */
     public function update(Request $request, Brand $brand)
     {
-        $brand->name = $request->name;
-        $brand->description = $request->description;
-        $brand->save();
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required',
+                'description' => 'required',
+            ]);
 
-        return redirect('/brands')->with('message', 'Brand Updated Successfully');
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+            }
+
+            $brand->name = $request->input('name');
+            $brand->description = $request->input('description');
+            $brand->save();
+
+            return response()->json(['message' => 'Brand Updated Successfully'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update brand'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -94,9 +125,15 @@ class BrandController extends Controller
      */
     public function destroy(Brand $brand)
     {
-        $delete = $brand->delete();
-        if($delete){
-            return redirect()->back()->with('message', 'Brand Deleted Successfully');
+        try {
+            $delete = $brand->delete();
+            if ($delete) {
+                return response()->json(['message' => 'Brand Deleted Successfully'], Response::HTTP_OK);
+            } else {
+                return response()->json(['error' => 'Failed to delete brand'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete brand'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

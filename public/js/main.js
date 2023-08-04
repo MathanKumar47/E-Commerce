@@ -1,6 +1,19 @@
 (function($) {
 	"use strict"
 
+	loadCart();
+
+	function loadCart() {
+        $.ajax({
+            method: "GET",
+            url: "/load-cart-data",
+            success: function(response) {
+                $('.cart-count').html(response.cartCount);
+                $('.wishlist-count').html(response.wishlistCount);
+            }
+        });
+    }
+
 	// Mobile Nav toggle
 	$('.menu-toggle > a').on('click', function (e) {
 		e.preventDefault();
@@ -11,6 +24,57 @@
 	$('.cart-dropdown').on('click', function (e) {
 		e.stopPropagation();
 	});
+
+	$('.quick-view').on('click', function () {
+		var productId = $(this).data('product-id');
+		// AJAX request to get the product details
+		$.ajax({
+			url: '/get_quick_view/' + productId,
+			method: 'GET',
+			success: function (response) {
+				$('#quickViewContent').html(response); // Populate the modal content with the product details
+				$('#quickViewModal').modal('show'); // Show the modal
+			},
+			error: function (error) {
+				console.log('Error fetching product details:', error);
+			}
+		});
+	});
+
+	$(document).on('click', '.add-to-wishlist', function(event) {
+        event.preventDefault();
+
+		$.ajaxSetup({
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			}
+		});
+
+        var product_id = $(this).closest('.product_data').find('.product_id').val();
+        $.ajax({
+            method: "POST",
+            url: "/add-to-wishlist",
+            data: {
+                'product_id': product_id,
+            },
+            success: function(response) {
+
+				alert(response.status);
+
+				loadCart();
+                // if (response.status === "success") {
+                //     swal("Success", response.message, "success");
+                // } else {
+                //     swal("Warning", response.message, "warning");
+                // }
+
+                // Change the button to "View Cart" after adding to cart
+            }
+        });
+
+    });
+
+	
 
 	/////////////////////////////////////////
 
@@ -166,3 +230,5 @@
 	}
 
 })(jQuery);
+
+

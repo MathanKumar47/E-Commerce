@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Response;
 
 class CategoryController extends Controller
 {
@@ -36,21 +38,37 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $category = new Category();
-        $category->id = $request->category;
-        $category->name = $request->name;
-        $category->description = $request->description;
-        $category->image = $request->image->store('category');
+        try {
+            $validator = Validator::make($request->all(), [
+                'category' => 'required',
+                'name' => 'required',
+                'description' => 'required',
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
 
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $extension = $file->getClientOriginalExtension();
-            $filename = time() . '.' . $extension;
-            $file->move('category', $filename);
-            $category->image = $filename;
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 400);
+            }
+
+            $category = new Category();
+            $category->id = $request->input('category');
+            $category->name = $request->input('name');
+            $category->description = $request->input('description');
+
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $extension = $file->getClientOriginalExtension();
+                $filename = time() . '.' . $extension;
+                $file->move('category', $filename);
+                $category->image = $filename;
+            }
+
+            $category->save();
+
+            return response()->json(['message' => 'Category Created Successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to create category'], 500);
         }
-        $category->save();
-        return redirect()->back()->with('message', 'Category Created Successfully...');
     }
 
     /**
@@ -59,14 +77,16 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function change_status(Category $category)
+    public function changeStatus(Category $category)
     {
-        if ($category->status == 1) {
-            $category->update(['status' => 0]);
-        } else {
-            $category->update(['status' => 1]);
+        try {
+            $status = $category->status == 1 ? 0 : 1;
+            $category->update(['status' => $status]);
+
+            return response()->json(['message' => 'Status Change Successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to change status'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        return redirect()->back()->with('message', 'Status Change Successfully');
     }
 
     /**
@@ -89,21 +109,34 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        $category->name = $request->name;
-        $category->description = $request->description;
-        $category->image = $request->image->store('category');
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required',
+                'description' => 'required',
+                'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
 
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $extension = $file->getClientOriginalExtension();
-            $filename = time() . '.' . $extension;
-            $file->move('category', $filename);
-            $category->image = $filename;
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+            }
+
+            $category->name = $request->input('name');
+            $category->description = $request->input('description');
+
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $extension = $file->getClientOriginalExtension();
+                $filename = time() . '.' . $extension;
+                $file->move('category', $filename);
+                $category->image = $filename;
+            }
+
+            $category->save();
+
+            return response()->json(['message' => 'Category Updated Successfully'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update category'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        $category->save();
-
-        return redirect('/categories')->with('message', 'Category Updated Successfully');
     }
 
     /**
@@ -114,9 +147,16 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        $delete = $category->delete();
-        if($delete){
-            return redirect()->back()->with('message', 'Category Deleted Successfully');
+        try {
+            $delete = $category->delete();
+            if ($delete) {
+                return response()->json(['message' => 'Category Deleted Successfully'], Response::HTTP_OK);
+            } else {
+                return response()->json(['error' => 'Failed to delete category'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete category'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
 }

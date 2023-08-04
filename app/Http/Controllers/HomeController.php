@@ -16,7 +16,7 @@ class HomeController extends Controller
         $categories = Category::all();
         $subcategories = SubCategory::all();
         $brands = Brand::all();
-        $products = Product::where('status', 1)->latest()->limit(20)->get();
+        $products = Product::where('status', 1)->inRandomOrder()->limit(20)->get();
 
         $top_sales = DB::table('products')
             ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
@@ -31,7 +31,7 @@ class HomeController extends Controller
             $p->totalQty = $s->total;
             $topProducts[] = $p;
         }
-        return view('frontend.welcome', compact('categories', 'subcategories', 'brands', 'products','topProducts'));
+        return view('frontend.welcome', compact('categories', 'subcategories', 'brands', 'products', 'topProducts'));
     }
 
     public function view_details($id)
@@ -42,7 +42,8 @@ class HomeController extends Controller
         $product = Product::findOrFail($id);
         $cat_id = $product->cat_id;
         $related_products = Product::where('cat_id', $cat_id)->limit(4)->get();
-        return view('frontend.pages.view_details', compact('categories', 'subcategories', 'brands', 'product', 'related_products'));
+        $wish_products = Product::all();
+        return view('frontend.pages.view_details', compact('categories', 'subcategories', 'brands', 'product', 'related_products', 'wish_products'));
     }
 
     public function product_by_cat($id)
@@ -63,13 +64,20 @@ class HomeController extends Controller
         return view('frontend.pages.product_by_subcat', compact('categories', 'subcategories', 'brands', 'products'));
     }
 
-    public function search(Request $request){
-        $products=Product::orderBy('id','desc')->where('name','LIKE','%'.$request->product.'%');
-        if ($request->category!= "ALL") $products->where('cat_id',$request->category);
+    public function search(Request $request)
+    {
+        $products = Product::orderBy('id', 'desc')->where('name', 'LIKE', '%' . $request->product . '%');
+        if ($request->category != "ALL") $products->where('cat_id', $request->category);
         $products = $products->get();
         $categories = Category::all();
         $subcategories = SubCategory::all();
         $brands = Brand::all();
         return view('frontend.pages.product_by_cat', compact('categories', 'subcategories', 'brands', 'products'));
+    }
+
+    public function getQuickView($id)
+    {
+        $product = Product::find($id);
+        return view('frontend.quick_view', compact('product'));
     }
 }

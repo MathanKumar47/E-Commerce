@@ -1,9 +1,8 @@
     <div id="top-header">
         <div class="container">
             <ul class="header-links pull-left">
-                <li><a href="#"><i class="fa fa-phone"></i> +021-95-51-84</a></li>
-                <li><a href="#"><i class="fa fa-envelope-o"></i> email@email.com</a></li>
-                <li><a href="#"><i class="fa fa-map-marker"></i> 1734 Stonecoal Road</a></li>
+                <li><a href="#"><i class="fa fa-phone"></i> +91-9988776655</a></li>
+                <li><a href="#"><i class="fa fa-envelope-o"></i> nammakadai@email.com</a></li>
             </ul>
             <ul class="header-links pull-right">
                 <li><a href="#"><i class="bi bi-currency-rupee"></i>INR</a></li>
@@ -70,12 +69,16 @@
                     <div class="header-search">
                         <form action="{{ url('/search') }}" method="GET">
                             <select class="input-select" name='category'>
-                                <option value="ALL" {{ request('category') == "ALL" ? 'selected' : '' }}>All Categories</option>
+                                <option value="ALL" {{ request('category') == 'ALL' ? 'selected' : '' }}>All
+                                    Categories</option>
                                 @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                    <option value="{{ $category->id }}"
+                                        {{ request('category') == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}</option>
                                 @endforeach
                             </select>
-                            <input class="input" name="product" placeholder="Search here" value="{{ request('product') }}">
+                            <input class="input" name="product" placeholder="Search here"
+                                value="{{ request('product') }}">
                             <button class="search-btn">Search</button>
                         </form>
                     </div>
@@ -86,12 +89,35 @@
                 <div class="col-md-3 clearfix">
                     <div class="header-ctn">
                         <!-- Wishlist -->
-                        <div>
-                            <a href="#">
+                        <div class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
                                 <i class="fa fa-heart-o"></i>
                                 <span>Your Wishlist</span>
-                                <div class="qty">2</div>
+                                <div class="qty">{{ Auth::user()->wishlist->count() }}</div>
                             </a>
+                            <div class="cart-dropdown">
+                                <div class="cart-list">
+                                    @foreach(Auth::user()->wishlist as $item)
+                                    <div class="product-widget">
+                                        <div class="product-img">
+                                            <img src="{{ asset('image/' . $item->product->image) }}" alt="{{ $item->product->name }}">
+                                        </div>
+                                        <div class="product-body">
+                                            <input type="hidden" name="product_id" value="{{ $item->product->id }}">
+                                            <h6><a href="{{ url('/product_by_cat'.$item->product->category->id) }}">{{ $item->product->category->name }}</a></h6>
+                                            <h6><a href="{{ url('/product-by-subcat'.$item->product->subcategory->id) }}">{{ $item->product->subcategory->name }}</a></h4>
+                                            <h3 class="product-name"><a href="{{ url('/view-details'. $item->product->id) }}">{{ $item->product->name }}</a></h3>
+                                        </div>
+                                        <form method="post" action="{{ route('wishlist.remove') }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <input type="hidden" name="product_id" value="{{ $item->product->id }}">
+                                            <button type="submit" class="delete"><i class="fa fa-close"></i></button>
+                                        </form>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
                         <!-- /Wishlist -->
                         <!-- Cart -->

@@ -120,8 +120,9 @@ use App\Models\Product;
                                     </div>
                                 </div>
                                 <div class="add-to-cart">
-                                    <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to
-                                        cart</button>
+                                    <input type="hidden" name="quantity" value="1">
+                                    <input type="hidden" name="id" value="{{ $product->id }}">
+                                    <a href="{{ url('/view-details' . $product->id) }}" class="add-to-cart-btn">View Detail</a>
                                 </div>
                             </div>
                         </div>

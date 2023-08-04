@@ -12,10 +12,10 @@
                 <!-- Product main img -->
                 <div class="col-md-5 col-md-push-2">
                     <div id="product-main-img">
-                        @foreach($product->image as $image)
-                        <div class="product-preview">
-                            <img src="{{ asset('image/'.$image) }}" alt="">
-                        </div>
+                        @foreach ($product->image as $image)
+                            <div class="product-preview">
+                                <img src="{{ asset('image/' . $image) }}" alt="">
+                            </div>
                         @endforeach
                     </div>
                 </div>
@@ -24,10 +24,10 @@
                 <!-- Product thumb imgs -->
                 <div class="col-md-2  col-md-pull-5">
                     <div id="product-imgs">
-                        @foreach($product->image as $image)
-                        <div class="product-preview">
-                            <img src="{{ asset('image/'.$image) }}" alt="">
-                        </div>
+                        @foreach ($product->image as $image)
+                            <div class="product-preview">
+                                <img src="{{ asset('image/' . $image) }}" alt="">
+                            </div>
                         @endforeach
 
                     </div>
@@ -36,7 +36,7 @@
 
                 <!-- Product details -->
                 <div class="col-md-5">
-                    <div class="product-details">
+                    <div class="product-details  product_data">
                         <h2 class="product-name">{{ $product->name }}</h2>
                         <div>
                             <div class="product-rating">
@@ -49,34 +49,34 @@
                             <a class="review-link" href="#">10 Review(s) | Add your review</a>
                         </div>
                         <div>
-                            <h3 class="product-price">&#8377;{{ $product->price }} <del class="product-old-price">&#8377;{{ $product->price }}</del></h3>
+                            <h3 class="product-price">&#8377;{{ $product->price }} <del
+                                    class="product-old-price">&#8377;{{ $product->price }}</del></h3>
                             <span class="product-available">In Stock</span>
                         </div>
-                        <p>{{$product->description}}</p>
+                        <p>{{ $product->description }}</p>
 
-                        <div class="add-to-cart">
-                            <div class="qty-label">
-                                Qty
-                                <div class="input-number">
-                                    <input type="number">
-                                    <span class="qty-up">+</span>
-                                    <span class="qty-down">-</span>
+                        <form action="{{ url('/add-to-cart') }}" method="POST">
+                            @csrf
+                            <div class="add-to-cart">
+                                <div class="qty-label">
+                                    Qty
+                                    <div class="input-number">
+                                        <input type="number" name="quantity" value="1">
+                                        <span class="qty-up">+</span>
+                                        <span class="qty-down">-</span>
+                                    </div>
+                                </div>
+                                <div class="add-to-cart">
+                                    <input type="hidden" name="id" value="{{ $product->id }}">
+                                    <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to
+                                        cart</button>
                                 </div>
                             </div>
-                            <form action="{{ url('add-to-cart') }}" method="POST">
-                                @csrf
-                                <div class="add-to-cart">
-                                    <input type="hidden" name="quantity" value="1">
-                                    <input type="hidden" name="id" value="{{ $product->id }}">
-                                    <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
-                                </div>
-                            </form>
-                        </div>
+                        </form>
 
-                        <ul class="product-btns">
-                            <li><a href="#"><i class="fa fa-heart-o"></i> add to wishlist</a></li>
-                            <li><a href="#"><i class="fa fa-exchange"></i> add to compare</a></li>
-                        </ul>
+                            <input type="hidden" class="product_id" value="{{ $product->id }}">
+                            <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span
+                                class="tooltipp"></span></button>
 
                         <ul class="product-links">
                             <li>Category:</li>
@@ -113,7 +113,7 @@
                             <div id="tab1" class="tab-pane fade in active">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <p>{{$product->description}}</p>
+                                        <p>{{ $product->description }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -316,57 +316,64 @@
     <!-- /SECTION -->
 
     <!-- Section -->
-		<div class="section">
-			<!-- container -->
-			<div class="container">
-				<!-- row -->
-				<div class="row">
+    <div class="section">
+        <!-- container -->
+        <div class="container">
+            <!-- row -->
+            <div class="row">
 
-					<div class="col-md-12">
-						<div class="section-title text-center">
-							<h3 class="title">Related Products</h3>
-						</div>
-					</div>
+                <div class="col-md-12">
+                    <div class="section-title text-center">
+                        <h3 class="title">Related Products</h3>
+                    </div>
+                </div>
 
-                    @foreach ($related_products as $related_product)
+                @foreach ($related_products as $related_product)
                     @php
-                        $related_product['image']=explode("|",$related_product->image);
-                        $images=$related_product->image[0];
+                        $related_product['image'] = explode('|', $related_product->image);
+                        $images = $related_product->image[0];
                     @endphp
-					<!-- product -->
-					<div class="col-md-3 col-xs-6">
-						<div class="product">
-							<div class="product-img">
-								<img src="{{ asset('image/'.$images) }}" alt="">
-								<div class="product-label">
-									<span class="sale">-30%</span>
-								</div>
-							</div>
-							<div class="product-body">
-								<p class="product-category">{{ $related_product->category->name }}</p>
-								<h3 class="product-name"><a href="#">{{ $related_product->name }}</a></h3>
-								<h4 class="product-price">&#8377;{{ $related_product->price }} <del class="product-old-price">&#8377;{{ $product->price }} </del></h4>
-								<div class="product-rating">
-								</div>
-								<div class="product-btns">
-									<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
-									<button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
-									<button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
-								</div>
-							</div>
-                            
-							<div class="add-to-cart">
-								<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
-							</div>
-						</div>
-					</div>
-					<!-- /product -->
-                    @endforeach
+                    <!-- product -->
+                    <div class="col-md-3 col-xs-6">
+                        <div class="product">
+                            <div class="product-img">
+                                <img src="{{ asset('image/' . $images) }}" alt="">
+                                <div class="product-label">
+                                    <span class="sale">-30%</span>
+                                </div>
+                            </div>
+                            <div class="product-body">
+                                <p class="product-category">{{ $related_product->category->name }}</p>
+                                <h3 class="product-name"><a href="#">{{ $related_product->name }}</a></h3>
+                                <h4 class="product-price">&#8377;{{ $related_product->price }} <del
+                                        class="product-old-price">&#8377;{{ $product->price }} </del></h4>
+                                <div class="product-rating">
+                                </div>
+                                <div class="product-btns">
+                                    <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span
+                                            class="tooltipp">add to wishlist</span></button>
+                                    <button class="add-to-compare"><i class="fa fa-exchange"></i><span
+                                            class="tooltipp">add to compare</span></button>
+                                    <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick
+                                            view</span></button>
+                                </div>
+                            </div>
 
-				</div>
-				<!-- /row -->
-			</div>
-			<!-- /container -->
-		</div>
-		<!-- /Section -->
+                            <div class="add-to-cart">
+                                <input type="hidden" name="quantity" value="1">
+                                <input type="hidden" name="id" value="{{ $related_product->id }}">
+                                <a href="{{ url('/view-details' . $related_product->id) }}" class="add-to-cart-btn">View
+                                    Detail</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /product -->
+                @endforeach
+
+            </div>
+            <!-- /row -->
+        </div>
+        <!-- /container -->
+    </div>
+    <!-- /Section -->
 @endsection

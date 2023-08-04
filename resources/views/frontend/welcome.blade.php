@@ -5,7 +5,7 @@
         <!-- container -->
         <div class="container">
             <!-- row -->
-            <div class="row">
+            <div class="row ">
                 <!-- shop -->
                 @foreach ($categories as $category)
                     <div class="col-sm-3">
@@ -44,7 +44,8 @@
                             <ul class="section-tab-nav tab-nav">
                                 @foreach ($categories as $category)
                                     <li class=""><a
-                                            href="{{ url('/product_by_cat' . $category->id) }}">{{ $category->name }}</a></li>
+                                            href="{{ url('/product_by_cat' . $category->id) }}">{{ $category->name }}</a>
+                                    </li>
                                 @endforeach
                             </ul>
                         </div>
@@ -54,7 +55,7 @@
 
                 <!-- Products tab & slick -->
                 <div class="col-md-12">
-                    <div class="row">
+                    <div class="row ">
                         <div class="products-tabs">
                             <!-- tab -->
                             <div id="tab1" class="tab-pane active">
@@ -65,15 +66,10 @@
                                             $product['image'] = explode('|', $product->image);
                                             $images = $product->image[0];
                                         @endphp
-                                        <div class="product">
+                                        <div class="product product_data">
                                             <div class="product-img"><a href="{{ url('/view-details' . $product->id) }}">
                                                     <img src="{{ asset('image/' . $images) }}"
                                                         style="width: 100%; height: 100%;">
-                                                    <div class="product-label">
-                                                        <span class="sale">-30%</span>
-                                                        <span class="new">NEW</span>
-                                                    </div>
-                                                </a>
                                             </div>
                                             <div class="product-body">
                                                 <p class="product-category"><a
@@ -94,33 +90,64 @@
                                                     <i class="fa fa-star"></i>
                                                 </div>
                                                 <div class="product-btns">
-                                                    <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span
-                                                            class="tooltipp">add to wishlist</span></button>
-                                                    <button class="add-to-compare"><i class="fa fa-exchange"></i><span
-                                                            class="tooltipp">add to compare</span></button>
-                                                    <button class="quick-view"><i class="fa fa-eye"></i><span
-                                                            class="tooltipp">quick view</span></button>
+                                                        <input type="hidden" class="product_id" value="{{ $product->id }}">
+                                                        <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span
+                                                                class="tooltipp">add wishlist</span></button>
+                                                    {{-- <button class="quick-view" data-product-id="{{ $product->id }}">
+                                                        <i class="fa fa-eye"></i><span class="tooltipp">quick view</span>
+                                                    </button> --}}
+                                                    <button class="quick-view" data-product-id="{{ $product->id }}">
+                                                        <i class="fa fa-eye"></i><span class="tooltipp">quick view</span>
+                                                    </button>                                                
                                                 </div>
+                                                <!-- Quick View Modal -->
+                                                {{-- <div class="modal fade" id="quickViewModal" tabindex="-1" role="dialog" aria-labelledby="quickViewModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="quickViewModalLabel">Product Quick View</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body" id="quickViewContent">
+                                                                @include('frontend.quick_view')
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> --}}
                                             </div>
-                                            <form action="{{ url('add-to-cart') }}" method="POST">
-                                                @csrf
-                                                <div class="add-to-cart">
-                                                    <input type="hidden" name="quantity" value="1">
-                                                    <input type="hidden" name="id" value="{{ $product->id }}">
-                                                    <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
-                                                </div>
-                                            </form>
+                                            <div class="add-to-cart">
+                                                <input type="hidden" name="quantity" value="1">
+                                                <input type="hidden" name="id" value="{{ $product->id }}">
+                                                <a href="{{ url('/view-details' . $product->id) }}"
+                                                    class="add-to-cart-btn">View Detail</a>
+                                            </div>
                                         </div>
                                     @endforeach
                                     <!-- /product -->
                                 </div>
-                                <div id="slick-nav-1" class="products-slick-nav"></div>
                             </div>
                             <!-- /tab -->
                         </div>
                     </div>
                 </div>
                 <!-- Products tab & slick -->
+                <div class="modal fade py-5" id="quickViewModal" tabindex="-1" role="dialog" aria-labelledby="quickViewModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="quickViewModalLabel">Product Quick View</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body" id="quickViewContent">
+                                @include('frontend.quick_view')
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <!-- /row -->
         </div>
@@ -179,7 +206,7 @@
         <!-- container -->
         <div class="container">
             <!-- row -->
-            <div class="row">
+            <div class="row product_data">
 
                 <!-- section title -->
                 <div class="col-md-12">
@@ -189,7 +216,8 @@
                             <ul class="section-tab-nav tab-nav">
                                 @foreach ($categories as $category)
                                     <li class=""><a
-                                            href="{{ url('/product_by_cat' . $category->id) }}">{{ $category->name }}</a></li>
+                                            href="{{ url('/product_by_cat' . $category->id) }}">{{ $category->name }}</a>
+                                    </li>
                                 @endforeach
                             </ul>
                         </div>
@@ -210,14 +238,11 @@
                                             $topProduct['image'] = explode('|', $topProduct->image);
                                             $images = $topProduct->image[0];
                                         @endphp
-                                        <div class="product">
-                                            <div class="product-img"><a href="{{ url('/view-details' . $topProduct->id) }}">
+                                        <div class="product  product_data">
+                                            <div class="product-img"><a
+                                                    href="{{ url('/view-details' . $topProduct->id) }}">
                                                     <img src="{{ asset('image/' . $images) }}"
                                                         style="width: 100%; height: 100%;">
-                                                    <div class="product-label">
-                                                        <span class="sale">-30%</span>
-                                                        <span class="new">NEW</span>
-                                                    </div>
                                                 </a>
                                             </div>
                                             <div class="product-body">
@@ -239,127 +264,65 @@
                                                     <i class="fa fa-star"></i>
                                                 </div>
                                                 <div class="product-btns">
-                                                    <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span
-                                                            class="tooltipp">add to wishlist</span></button>
-                                                    <button class="add-to-compare"><i class="fa fa-exchange"></i><span
-                                                            class="tooltipp">add to compare</span></button>
-                                                    <button class="quick-view"><i class="fa fa-eye"></i><span
-                                                            class="tooltipp">quick view</span></button>
+                                                        <input type="hidden" class="product_id" value="{{ $topProduct->id }}">
+                                                        <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span
+                                                                class="tooltipp">add wishlist</span></button>
+                                                    <button class="quick-view" data-product-id="{{ $product->id }}">
+                                                        <i class="fa fa-eye"></i><span class="tooltipp">quick view</span>
+                                                    </button> 
                                                 </div>
+                                                <!-- Quick View Modal -->
+                                                {{-- <div class="modal fade" id="quickViewModal" tabindex="-1" role="dialog" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered" role="document" style="background-color: rgba(0, 0, 0, .5); z-index: 999999999999;">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Quick View</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body" id="quickViewContent">
+                                                                @include('frontend.quick_view')
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> --}}
                                             </div>
-                                            <form action="{{ url('add-to-cart') }}" method="POST">
-                                                @csrf
-                                                <div class="add-to-cart">
-                                                    <input type="hidden" name="quantity" value="1">
-                                                    <input type="hidden" name="id" value="{{ $topProduct->id }}">
-                                                    <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
-                                                </div>
-                                            </form>
+                                            <div class="add-to-cart">
+                                                <input type="hidden" name="quantity" value="1">
+                                                <input type="hidden" name="id" value="{{ $topProduct->id }}">
+                                                <a href="{{ url('/view-details' . $product->id) }}"
+                                                    class="add-to-cart-btn">View Detail</a>
+                                            </div>
                                         </div>
                                     @endforeach
                                     <!-- /product -->
                                 </div>
-                                <div id="slick-nav-1" class="products-slick-nav"></div>
                             </div>
                             <!-- /tab -->
                         </div>
                     </div>
                 </div>
                 <!-- Products tab & slick -->
+                <div class="modal fade py-5" id="quickViewModal" tabindex="-1" role="dialog" aria-labelledby="quickViewModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="quickViewModalLabel">Product Quick View</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body" id="quickViewContent">
+                                @include('frontend.quick_view')
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <!-- /row -->
         </div>
         <!-- /container -->
     </div>
     <!-- /SECTION -->
-
-    <!-- SECTION -->
-    <div class="section">
-        <!-- container -->
-        <div class="container">
-            <!-- row -->
-            <div class="row">
-                <div class="col-md-4 col-xs-6">
-                    <div class="section-title">
-                        <h4 class="title">Top Selling</h4>
-                        <div class="section-nav">
-                            <div id="slick-nav-3" class="products-slick-nav"></div>
-                        </div>
-                    </div>
-
-                    <div class="products-widget-slick" data-nav="#slick-nav-3">
-                        <!-- product widget -->
-                        <div class="product-widget">
-                            <div class="product-img">
-                                <img src="./img/product07.png" alt="">
-                            </div>
-                            <div class="product-body">
-                                <p class="product-category">Category</p>
-                                <h3 class="product-name"><a href="#">product name goes here</a></h3>
-                                <h4 class="product-price">$980.00 <del class="product-old-price">$990.00</del></h4>
-                            </div>
-                        </div>
-                        <!-- /product widget -->
-                    </div>
-                </div>
-
-                <div class="col-md-4 col-xs-6">
-                    <div class="section-title">
-                        <h4 class="title">Top selling</h4>
-                        <div class="section-nav">
-                            <div id="slick-nav-4" class="products-slick-nav"></div>
-                        </div>
-                    </div>
-
-                    <div class="products-widget-slick" data-nav="#slick-nav-4">
-                        <div>
-                            <!-- product widget -->
-                            <div class="product-widget">
-                                <div class="product-img">
-                                    <img src="./img/product04.png" alt="">
-                                </div>
-                                <div class="product-body">
-                                    <p class="product-category">Category</p>
-                                    <h3 class="product-name"><a href="#">product name goes here</a></h3>
-                                    <h4 class="product-price">$980.00 <del class="product-old-price">$990.00</del></h4>
-                                </div>
-                            </div>
-                            <!-- /product widget -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="clearfix visible-sm visible-xs"></div>
-
-                <div class="col-md-4 col-xs-6">
-                    <div class="section-title">
-                        <h4 class="title">Top selling</h4>
-                        <div class="section-nav">
-                            <div id="slick-nav-5" class="products-slick-nav"></div>
-                        </div>
-                    </div>
-
-                    <div class="products-widget-slick" data-nav="#slick-nav-5">
-                        <div>
-                            <!-- product widget -->
-                            <div class="product-widget">
-                                <div class="product-img">
-                                    <img src="./img/product01.png" alt="">
-                                </div>
-                                <div class="product-body">
-                                    <p class="product-category">Category</p>
-                                    <h3 class="product-name"><a href="#">product name goes here</a></h3>
-                                    <h4 class="product-price">$980.00 <del class="product-old-price">$990.00</del></h4>
-                                </div>
-                            </div>
-                            <!-- /product widget -->
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <!-- /row -->
-        </div>
-        <!-- /container -->
-    </div>
 @endsection

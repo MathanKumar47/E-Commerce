@@ -24,6 +24,11 @@ class User extends Authenticatable
         'password',
     ];
 
+    public function wishlist()
+    {
+        return $this->hasMany(Whistlist::class, 'user_id');
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

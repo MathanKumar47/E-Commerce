@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\SubCategory;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 
 use Illuminate\Http\Request;
 
@@ -38,12 +40,27 @@ class SubCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $subcategory = new SubCategory;
-        $subcategory->cat_id = $request->category;
-        $subcategory->name = $request->name;
-        $subcategory->description = $request->description;
-        $subcategory->save();
-        return redirect()->back()->with('message', 'SubCategory Created Successfully...');
+        try {
+            $validator = Validator::make($request->all(), [
+                'category' => 'required',
+                'name' => 'required',
+                'description' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+            }
+
+            $subcategory = new SubCategory;
+            $subcategory->cat_id = $request->input('category');
+            $subcategory->name = $request->input('name');
+            $subcategory->description = $request->input('description');
+            $subcategory->save();
+
+            return response()->json(['message' => 'SubCategory Created Successfully'], Response::HTTP_CREATED);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to create subcategory'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -52,14 +69,16 @@ class SubCategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function change_status(SubCategory $subcategory)
+    public function changeStatus(SubCategory $subcategory)
     {
-        if ($subcategory->status == 1) {
-            $subcategory->update(['status' => 0]);
-        } else {
-            $subcategory->update(['status' => 1]);
+        try {
+            $status = $subcategory->status == 1 ? 0 : 1;
+            $subcategory->update(['status' => $status]);
+
+            return response()->json(['message' => 'Status Change Successfully'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to change status'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        return redirect()->back()->with('message', 'Status Change Successfully');
     }
 
     /**
@@ -83,12 +102,26 @@ class SubCategoryController extends Controller
      */
     public function update(Request $request, SubCategory $subCategory)
     {
-        $subCategory->name = $request->name;
-        $subCategory->cat_id = $request->category;
-        $subCategory->description = $request->description;
-        $subCategory->save();
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required',
+                'category' => 'required',
+                'description' => 'required',
+            ]);
 
-        return redirect('/sub-categories')->with('message', 'SubCategory Updated Successfully');
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+            }
+
+            $subCategory->name = $request->input('name');
+            $subCategory->cat_id = $request->input('category');
+            $subCategory->description = $request->input('description');
+            $subCategory->save();
+
+            return response()->json(['message' => 'SubCategory Updated Successfully'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update subcategory'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -99,9 +132,15 @@ class SubCategoryController extends Controller
      */
     public function destroy(SubCategory $subCategory)
     {
-        $delete = $subCategory->delete();
-        if($delete){
-            return redirect()->back()->with('message', 'SubCategory Deleted Successfully');
+        try {
+            $delete = $subCategory->delete();
+            if ($delete) {
+                return response()->json(['message' => 'SubCategory Deleted Successfully'], Response::HTTP_OK);
+            } else {
+                return response()->json(['error' => 'Failed to delete subcategory'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete subcategory'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
